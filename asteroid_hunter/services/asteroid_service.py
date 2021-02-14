@@ -7,5 +7,9 @@ class AsteroidService:
     neo_key = LocalApiKeys().neo_key
     return 'https://api.nasa.gov/neo/rest/v1/neo/' + uri + neo_key
 
-  # def get_neos(uri):
-    # return requests.get(AsteroidService.conn(uri))
+  def browse_neos(page):
+    params = {'page': page}
+    return requests.get(AsteroidService.conn('browse?'), params)
+
+  def neo_by_id(id):
+    return requests.get(AsteroidService.conn(id + '?'))
