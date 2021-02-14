@@ -9,7 +9,7 @@ class AsteroidService:
 
   def browse_neos(page):
     params = {'page': page}
-    return requests.get(AsteroidService.conn('browse?'), params)
+    return requests.get(AsteroidService.conn('browse?'), params=params)
 
-  def neo_by_id(id):
+  def asteroid_by_id(id):
     return requests.get(AsteroidService.conn(id + '?'))

@@ -11,7 +11,7 @@ def test_browse_neos():
   response = AsteroidService.browse_neos(0)
   assert response.status_code == 200
 
-@vcr.use_cassette('tests/fixtures/vcr_cassettes/neo_by_id.yaml', record_mode='once')
-def test_neo_by_id():
-  response = AsteroidService.neo_by_id('2001915')
+@vcr.use_cassette('tests/fixtures/vcr_cassettes/asteroid_by_id.yaml', record_mode='once')
+def test_asteroid_by_id():
+  response = AsteroidService.asteroid_by_id('3709286')
   assert response.status_code == 200
