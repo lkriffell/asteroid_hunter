@@ -16,7 +16,7 @@ class AsteroidFacade:
         closest_approach = AsteroidFacade.look_for_closer_approach(asteroid, closest_approach)
     return closest_approach['id']
 
-  # helpers for closest_approach_id()
+# helpers for closest_approach_id()
   def get_asteroid_data_by_page(page):
     return AsteroidService.browse_neos(page).json()['near_earth_objects']
 
@@ -27,7 +27,7 @@ class AsteroidFacade:
           and close_approach['miss_distance']['astronomical'] < closest_approach['close_approach_data'][0]['miss_distance']['astronomical']):
         closest_approach = asteroid
     return closest_approach
-  # --------------------------------
+# --------------------------------
 
   def close_approaches_by_month(result_size, year, month):
     finished = False
@@ -43,7 +43,7 @@ class AsteroidFacade:
       if day == calendar[month] : finished = True
     return closest_approaches[0 : result_size]
 
-  # helpers for close_approaches_by_month()
+# helpers for close_approaches_by_month()
   def get_asteroid_data_by_date(start_date, end_date):
     return AsteroidService.asteroid_approaches_by_week(start_date, end_date).json()['near_earth_objects']
 
@@ -52,7 +52,8 @@ class AsteroidFacade:
       for asteroid in asteroid_data[date.strftime("%Y-%m-%d")]:
         closest_approaches.append(asteroid)
         closest_approaches.sort(key=lambda x: x['close_approach_data'][0]['miss_distance']['astronomical'])
-        # This next line would work properly but when I try to return the final list it would cut the list to 5 elements no matter what
+        # This next line would work properly and reduce the list to 10 but when I try to return the final list it would cut the list to 5 elements no matter what
+        # I would've liked to keep this here for efficiency but it was breaking my code
         # closest_approaches = closest_approaches[0 : result_size]
       date += datetime.timedelta(1)
     return closest_approaches
@@ -81,7 +82,7 @@ class AsteroidFacade:
       return calendar[month]
     else:
       return day + 6
-  #----------------------------------------
+#----------------------------------------
   
   def asteroid_by_id(id):
     return AsteroidService.asteroid_by_id(id)
