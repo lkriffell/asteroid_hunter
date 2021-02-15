@@ -16,15 +16,17 @@ def test_asteroid_by_id():
   asteroid = AsteroidFacade.asteroid_by_id('3292020').json()
   assert asteroid['name'] == '(2005 TF)'
 
-@vcr.use_cassette('tests/fixtures/vcr_cassettes/asteroid_approaches_by_month.yaml', record_mode='once')
+@vcr.use_cassette('tests/fixtures/vcr_cassettes/january_approaches_by_month.yaml', record_mode='once')
 def test_close_approaches_by_month_can_get_top_ten():
   closest_approaches_in_january = AsteroidFacade.close_approaches_by_month(10, 2021, 1)
-  assert len(closest_approaches_in_january) == 10
-  assert closest_approaches_in_january[0]['name'] == '(2021 BO)'
+  assert len(closest_approaches_in_january['closest_approaches']) == 10
+  assert closest_approaches_in_january['closest_approaches'][0]['name'] == '(2021 BO)'
+  assert closest_approaches_in_january['element_count'] == 481
 
-@vcr.use_cassette('tests/fixtures/vcr_cassettes/asteroid_approaches_by_month.yaml', record_mode='once')
+@vcr.use_cassette('tests/fixtures/vcr_cassettes/january_approaches_by_month.yaml', record_mode='once')
 def test_close_approaches_by_month_can_get_top_twenty():
   closest_approaches_in_january = AsteroidFacade.close_approaches_by_month(20, 2021, 1)
-  assert len(closest_approaches_in_january) == 20
-  assert closest_approaches_in_january[0]['name'] == '(2021 BO)'
+  assert len(closest_approaches_in_january['closest_approaches']) == 20
+  assert closest_approaches_in_january['closest_approaches'][0]['name'] == '(2021 BO)'
+  assert closest_approaches_in_january['element_count'] == 481
 
