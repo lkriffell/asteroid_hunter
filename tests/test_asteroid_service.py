@@ -1,6 +1,7 @@
 from asteroid_hunter.services.asteroid_service import AsteroidService
 import vcr
 from local_api_keys import LocalApiKeys
+from pprint import pprint
 neo_key = LocalApiKeys().neo_key
 
 def test_conn():
@@ -16,9 +17,9 @@ def test_asteroid_by_id():
   response = AsteroidService.asteroid_by_id('3292020')
   assert response.status_code == 200
 
-@vcr.use_cassette('tests/fixtures/vcr_cassettes/close_approaches_by_month.yaml', record_mode='once')
-def test_close_approaches_by_month():
-  response = AsteroidService.close_approaches_by_month('2021-01-01', '2021-01-08')
+@vcr.use_cassette('tests/fixtures/vcr_cassettes/asteroid_approaches_by_week.yaml', record_mode='once')
+def test_asteroid_approaches_by_week():
+  response = AsteroidService.asteroid_approaches_by_week('2021-01-01', '2021-01-08')
   assert response.status_code == 200
 
 @vcr.use_cassette('tests/fixtures/vcr_cassettes/browse.yaml', record_mode='once')
@@ -27,6 +28,11 @@ def test_structure_browse_neos():
 
   asteroids = response.json()
 
+  assert type(asteroids['page']) is dict
+  assert type(asteroids['page']['number']) is int
+  assert type(asteroids['page']['size']) is int
+  assert type(asteroids['page']['total_elements']) is int
+  assert type(asteroids['page']['total_pages']) is int
   assert type(asteroids['near_earth_objects']) is list
   assert type(asteroids['near_earth_objects'][0]) is dict
 
@@ -37,18 +43,18 @@ def test_structure_browse_neos():
   verify_data_structure(first_asteroid)
 
 
-@vcr.use_cassette('tests/fixtures/vcr_cassettes/close_approaches_by_month.yaml', record_mode='once')
-def test_structure_close_approaches_by_month():
-  response = AsteroidService.close_approaches_by_month('2021-01-01', '2021-01-08')
+@vcr.use_cassette('tests/fixtures/vcr_cassettes/asteroid_approaches_by_week.yaml', record_mode='once')
+def test_structure_asteroid_approaches_by_week():
+  response = AsteroidService.asteroid_approaches_by_week('2021-01-01', '2021-01-08')
   
   close_approaches = response.json()
-  
+
   assert type(close_approaches['near_earth_objects']) is dict
   assert type(close_approaches['near_earth_objects']['2021-01-01']) is list
 
-  first_new_years_approach = close_approaches['near_earth_objects']['2021-01-01'][0]
+  first_new_years_asteroid = close_approaches['near_earth_objects']['2021-01-01'][0]
 
-  verify_data_structure(first_new_years_approach)
+  verify_data_structure(first_new_years_asteroid)
 
 def verify_data_structure(asteroid):
   assert type(asteroid) is dict
