@@ -21,7 +21,6 @@ class AsteroidFacade:
     return AsteroidService.browse_neos(page).json()['near_earth_objects']
 
   def look_for_closer_approach(asteroid, closest_approach):
-    # Changes the closest approach if any of this asteroid's approaches were closer
     for close_approach in asteroid['close_approach_data']:
       if (close_approach != []
           and close_approach['miss_distance']['astronomical'] < closest_approach['close_approach_data'][0]['miss_distance']['astronomical']):
@@ -34,28 +33,35 @@ class AsteroidFacade:
     day = 1
     calendar = AsteroidFacade.calendar(year)
     closest_approaches = []
+    element_count = 0
     while finished == False:
       start_date = datetime.date(year, month, day)
-      day = AsteroidFacade.add_a_week_to_day(month, day, calendar)
+      day = AsteroidFacade.add_days_to_date(start_date, calendar)
       end_date = datetime.date(year, month, day)
       asteroid_data = AsteroidFacade.get_asteroid_data_by_date(start_date, end_date)
-      AsteroidFacade.find_and_sort_closest_approaches(asteroid_data, closest_approaches, start_date)
+      closest_approaches = AsteroidFacade.find_and_sort_closest_approaches(asteroid_data['near_earth_objects'], closest_approaches, start_date, month)
       if day == calendar[month] : finished = True
-    return closest_approaches[0 : result_size]
+    element_count = len(closest_approaches)
+    result = {
+              'closest_approaches': closest_approaches[0 : result_size], 
+              'element_count': element_count
+              }
+    return result
 
 # helpers for close_approaches_by_month()
   def get_asteroid_data_by_date(start_date, end_date):
-    return AsteroidService.asteroid_approaches_by_week(start_date, end_date).json()['near_earth_objects']
+    return AsteroidService.asteroid_approaches_by_week(start_date, end_date).json()
 
-  def find_and_sort_closest_approaches(asteroid_data, closest_approaches, date):
+  def find_and_sort_closest_approaches(asteroid_data, closest_approaches, date, month):
     for day in range (0, 7):
-      for asteroid in asteroid_data[date.strftime("%Y-%m-%d")]:
-        closest_approaches.append(asteroid)
-        closest_approaches.sort(key=lambda x: x['close_approach_data'][0]['miss_distance']['astronomical'])
-        # This next line would work properly and reduce the list to 10 but when I try to return the final list it would cut the list to 5 elements no matter what
-        # I would've liked to keep this here for efficiency but it was breaking my code
-        # closest_approaches = closest_approaches[0 : result_size]
-      date += datetime.timedelta(1)
+      if date.month == month:
+        for asteroid in asteroid_data[date.strftime("%Y-%m-%d")]:
+          closest_approaches.append(asteroid)
+          closest_approaches.sort(key=lambda x: x['close_approach_data'][0]['miss_distance']['astronomical'])
+          # This next line would work properly and reduce the list to 10 but when I try to return the final list it would cut the list to 5 elements no matter what
+          # I would've liked to keep this here for efficiency but it was breaking my code
+          # closest_approaches = closest_approaches[0 : result_size]
+        date += datetime.timedelta(1)
     return closest_approaches
 
   def calendar(year):
@@ -73,15 +79,16 @@ class AsteroidFacade:
                 10: 31,
                 11: 30,
                 12: 31,
+                'year': year
                 }
     if (year % 4) == 0 : calendar[2] = 29
     return calendar
 
-  def add_a_week_to_day(month, day, calendar):
-    if (day + 6) > calendar[month]:
-      return calendar[month]
+  def add_days_to_date(date, calendar):
+    if (date.day + 7) > calendar[date.month]:
+      return calendar[date.month]
     else:
-      return day + 6
+      return date.day + 7
 #----------------------------------------
   
   def asteroid_by_id(id):
