@@ -12,8 +12,9 @@ class AsteroidService:
     path = AsteroidService.conn('neo/browse?')
     return requests.get(path, params=params)
 
-  def close_approach_by_month():
-    path = AsteroidService.conn('feed?start_date=2021-01-01&end_date=2021-01-08')
+  def close_approaches_by_month(start, end):
+    params = {start_date: start, end_date: end}
+    path = AsteroidService.conn('feed?')
     requests.get(path, params=params)
 
   def asteroid_by_id(id):

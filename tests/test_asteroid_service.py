@@ -15,3 +15,8 @@ def test_browse_neos():
 def test_asteroid_by_id():
   response = AsteroidService.asteroid_by_id('3709286')
   assert response.status_code == 200
+
+@vcr.use_cassette('tests/fixtures/vcr_cassettes/close_approaches_by_month.yaml', record_mode='once')
+def test_close_approaches_by_month():
+  response = AsteroidService.close_approaches_by_month('2021-01-01', '2021-01-08')
+  assert response.status_code == 200
