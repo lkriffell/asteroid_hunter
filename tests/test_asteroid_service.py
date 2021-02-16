@@ -8,8 +8,8 @@ def test_conn():
   assert AsteroidService.conn('neo/browse?') == ('https://api.nasa.gov/neo/rest/v1/neo/browse?' + neo_key)
 
 @vcr.use_cassette('tests/fixtures/vcr_cassettes/browse.yaml', record_mode='once')
-def test_browse_neos():
-  response = AsteroidService.browse_neos(0)
+def test_browse_neos_by_page():
+  response = AsteroidService.browse_neos_by_page(0)
   assert response.status_code == 200
 
 @vcr.use_cassette('tests/fixtures/vcr_cassettes/asteroid_by_id.yaml', record_mode='once')
@@ -23,8 +23,8 @@ def test_asteroid_approaches_by_week():
   assert response.status_code == 200
 
 @vcr.use_cassette('tests/fixtures/vcr_cassettes/browse.yaml', record_mode='once')
-def test_structure_browse_neos():
-  response = AsteroidService.browse_neos(0)
+def test_structure_browse_neos_by_page():
+  response = AsteroidService.browse_neos_by_page(0)
 
   asteroids = response.json()
 
