@@ -1,11 +1,13 @@
-# import os
-from local_api_keys import LocalApiKeys
 import requests
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+API_KEY = os.getenv('NEO_API_KEY')
 
 class AsteroidService:
   def conn(uri):
-    neo_key = LocalApiKeys().neo_key
-    return 'https://api.nasa.gov/neo/rest/v1/' + uri + neo_key
+    return 'https://api.nasa.gov/neo/rest/v1/' + uri + f"api_key={API_KEY}"
 
   def browse_neos_by_page(page):
     params = {'page': page}
@@ -18,5 +20,5 @@ class AsteroidService:
     return requests.get(path, params=params)
 
   def asteroid_by_id(id):
-    uri = 'neo/' + id + '?'
+    uri = f"neo/{id}?"
     return requests.get(AsteroidService.conn(uri))
