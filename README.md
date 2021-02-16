@@ -4,7 +4,7 @@
   - Clone this repo to your machine
   - Get a nasa api key here: https://api.nasa.gov/
   - Add your `API_KEY` to `.env` in the root file. ex: `API_KEY=MY_KEY`
-  - If the dependency in the lockfile is throwing this error: `ModuleNotFoundError: No module named 'dotenv'`, run `sudo pip3 install python-dotenv`
+  - If you are getting this error: `ModuleNotFoundError: No module named 'dotenv'`, run `sudo pip3 install python-dotenv`. This means the dependency in the lockfile is not properly working
 
 ## Running Tests
   - Run the test suite with `pytest`
