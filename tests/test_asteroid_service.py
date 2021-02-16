@@ -1,28 +1,30 @@
 from asteroid_hunter.services.asteroid_service import AsteroidService
 import vcr
-from local_api_keys import LocalApiKeys
-from pprint import pprint
-neo_key = LocalApiKeys().neo_key
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+API_KEY = os.getenv('NEO_API_KEY')
 
 def test_conn():
-  assert AsteroidService.conn('neo/browse?') == ('https://api.nasa.gov/neo/rest/v1/neo/browse?' + neo_key)
+  assert AsteroidService.conn('neo/browse?') == ('https://api.nasa.gov/neo/rest/v1/neo/browse?' + f"api_key={API_KEY}")
 
-@vcr.use_cassette('tests/fixtures/vcr_cassettes/browse.yaml', record_mode='once')
+@vcr.use_cassette('tests/fixtures/vcr_cassettes/browse.yaml', record_mode='once', filter_query_parameters=['api_key'])
 def test_browse_neos_by_page():
   response = AsteroidService.browse_neos_by_page(0)
   assert response.status_code == 200
 
-@vcr.use_cassette('tests/fixtures/vcr_cassettes/asteroid_by_id.yaml', record_mode='once')
+@vcr.use_cassette('tests/fixtures/vcr_cassettes/asteroid_by_id.yaml', record_mode='once', filter_query_parameters=['api_key'])
 def test_asteroid_by_id():
   response = AsteroidService.asteroid_by_id('3292020')
   assert response.status_code == 200
 
-@vcr.use_cassette('tests/fixtures/vcr_cassettes/asteroid_approaches_by_week.yaml', record_mode='once')
+@vcr.use_cassette('tests/fixtures/vcr_cassettes/asteroid_approaches_by_week.yaml', record_mode='once', filter_query_parameters=['api_key'])
 def test_asteroid_approaches_by_week():
   response = AsteroidService.asteroid_approaches_by_week('2021-01-01', '2021-01-08')
   assert response.status_code == 200
 
-@vcr.use_cassette('tests/fixtures/vcr_cassettes/browse.yaml', record_mode='once')
+@vcr.use_cassette('tests/fixtures/vcr_cassettes/browse.yaml', record_mode='once', filter_query_parameters=['api_key'])
 def test_structure_browse_neos_by_page():
   response = AsteroidService.browse_neos_by_page(0)
 
@@ -43,7 +45,7 @@ def test_structure_browse_neos_by_page():
   verify_data_structure(first_asteroid)
 
 
-@vcr.use_cassette('tests/fixtures/vcr_cassettes/asteroid_approaches_by_week.yaml', record_mode='once')
+@vcr.use_cassette('tests/fixtures/vcr_cassettes/asteroid_approaches_by_week.yaml', record_mode='once', filter_query_parameters=['api_key'])
 def test_structure_asteroid_approaches_by_week():
   response = AsteroidService.asteroid_approaches_by_week('2021-01-01', '2021-01-08')
   
