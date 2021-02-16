@@ -4,7 +4,7 @@ from calendar import monthrange
 import datetime
 
 class AsteroidFacade:  
-  def nearest_misses(result_size):
+  def closest_approaches(result_size):
     page = 0
     closest_misses = []
     asteroid_data = AsteroidService.browse_neos_by_page(page).json()
@@ -37,7 +37,7 @@ class AsteroidFacade:
 
 # ---------------------------------------
 
-  def close_approaches_by_month(result_size, year, month):
+  def closest_approaches_by_month(result_size, year, month):
     finished = False
     day = 1
     closest_approaches = []
@@ -47,14 +47,14 @@ class AsteroidFacade:
       day = AsteroidFacade.add_days_to_date(start_date, total_days)
       end_date = datetime.date(year, month, day)
       asteroid_data = AsteroidService.asteroid_approaches_by_week(start_date, end_date).json()
-      closest_approaches = AsteroidFacade.find_and_sort_closest_approaches(asteroid_data['near_earth_objects'], closest_approaches, start_date, month)
+      closest_approaches = AsteroidFacade.sort_closest_approaches_by_month(asteroid_data['near_earth_objects'], closest_approaches, start_date, month)
       if day == total_days : finished = True
     return {
             'closest_approaches': closest_approaches[0 : result_size], 
             'element_count': len(closest_approaches)
             }
 
-  def find_and_sort_closest_approaches(asteroid_data, closest_approaches, date, month):
+  def sort_closest_approaches_by_month(asteroid_data, closest_approaches, date, month):
     for day in range (0, 7):
       if date.month == month:
         for asteroid in asteroid_data[date.strftime("%Y-%m-%d")]:
