@@ -3,37 +3,45 @@ import json
 from pprint import pprint
 import datetime
 
-class AsteroidFacade:
-  def closest_approach_id():
+class AsteroidFacade:  
+  def nearest_misses(result_size = 10):
     page = 0
-    asteroid_data = AsteroidFacade.get_asteroid_data_by_page(page)
-    closest_approach = asteroid_data[0]
-    # while asteroid_data != []:
-    while page < 230:
-      asteroid_data = AsteroidFacade.get_asteroid_data_by_page(page)
+    closest_misses = []
+    asteroid_data = AsteroidService.browse_neos_by_page(page).json()
+    # total_pages = asteroid_data['page']['total_pages']
+    # while page <= total_pages:
+    while page <= 50:
+      AsteroidFacade.order_closest_misses(asteroid_data['near_earth_objects'], closest_misses, result_size)
       page += 1
-      for asteroid in asteroid_data:
-        closest_approach = AsteroidFacade.look_for_closer_approach(asteroid, closest_approach)
-    return closest_approach['id']
+      asteroid_data = AsteroidService.browse_neos_by_page(page).json()
+    if result_size > 1:
+      return AsteroidFacade.gather_asteroids(closest_misses[0 : result_size])
+    else:
+      return AsteroidFacade.gather_asteroids(closest_misses)[0]
 
-# helpers for closest_approach_id()
-  def get_asteroid_data_by_page(page):
-    return AsteroidService.browse_neos(page).json()['near_earth_objects']
+  def order_closest_misses(asteroid_data, closest_misses, result_size):
+    for asteroid in asteroid_data:
+      for close_approach in asteroid['close_approach_data']:
+        close_approach = {'id': asteroid['id'], 'close_approach_data': close_approach.copy()}
+        closest_misses.append(close_approach)
+    return closest_misses.sort(key=lambda x: x['close_approach_data']['miss_distance']['astronomical'])
 
-  def look_for_closer_approach(asteroid, closest_approach):
-    for close_approach in asteroid['close_approach_data']:
-      if (close_approach != []
-          and close_approach['miss_distance']['astronomical'] < closest_approach['close_approach_data'][0]['miss_distance']['astronomical']):
-        closest_approach = asteroid
-    return closest_approach
-# --------------------------------
+  def gather_asteroids(closest_misses):
+    results = []
+    for miss in closest_misses:
+      asteroid = AsteroidService.asteroid_by_id(miss['id']).json()
+      asteroid['close_approach_data'].sort(key=lambda x: x['miss_distance']['astronomical'])
+      asteroid['close_approach_data'] = asteroid['close_approach_data'][0]
+      results.append(asteroid)
+    return results
+      
 
+# ---------------------------------------
   def close_approaches_by_month(result_size, year, month):
     finished = False
     day = 1
-    calendar = AsteroidFacade.calendar(year)
     closest_approaches = []
-    element_count = 0
+    calendar = AsteroidFacade.calendar(year)
     while finished == False:
       start_date = datetime.date(year, month, day)
       day = AsteroidFacade.add_days_to_date(start_date, calendar)
@@ -58,9 +66,6 @@ class AsteroidFacade:
         for asteroid in asteroid_data[date.strftime("%Y-%m-%d")]:
           closest_approaches.append(asteroid)
           closest_approaches.sort(key=lambda x: x['close_approach_data'][0]['miss_distance']['astronomical'])
-          # This next line would work properly and reduce the list to 10 but when I try to return the final list it would cut the list to 5 elements no matter what
-          # I would've liked to keep this here for efficiency but it was breaking my code
-          # closest_approaches = closest_approaches[0 : result_size]
         date += datetime.timedelta(1)
     return closest_approaches
 
@@ -78,8 +83,7 @@ class AsteroidFacade:
                 9: 30,
                 10: 31,
                 11: 30,
-                12: 31,
-                'year': year
+                12: 31
                 }
     if (year % 4) == 0 : calendar[2] = 29
     return calendar
@@ -90,6 +94,3 @@ class AsteroidFacade:
     else:
       return date.day + 7
 #----------------------------------------
-  
-  def asteroid_by_id(id):
-    return AsteroidService.asteroid_by_id(id)
