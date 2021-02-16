@@ -11,7 +11,7 @@ class AsteroidFacade:
     # Commented out so cassette doesn't record 'Request limit reached'
     # total_pages = asteroid_data['page']['total_pages']
     # while page <= total_pages:
-    while page <= 10:
+    while page <= 200:
       AsteroidFacade.order_closest_misses(asteroid_data['near_earth_objects'], closest_misses, result_size)
       page += 1
       asteroid_data = AsteroidService.browse_neos_by_page(page).json()
