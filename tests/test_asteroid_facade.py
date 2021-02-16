@@ -1,7 +1,7 @@
 from asteroid_hunter.facades.asteroid_facade import AsteroidFacade
 import vcr
 
-@vcr.use_cassette('tests/fixtures/vcr_cassettes/browse.yaml', record_mode='once', filter_query_parameters=['api_key'])
+@vcr.use_cassette('tests/fixtures/vcr_cassettes/browse_two.yaml', record_mode='once', filter_query_parameters=['api_key'])
 def test_nearest_misses():
   ten_nearest_misses = AsteroidFacade.nearest_misses(10)
   assert len(ten_nearest_misses) == 10
