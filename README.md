@@ -9,7 +9,7 @@
 ## Running Tests
   - Run the test suite with `pytest`
   
-## Functions
+## Functions (Held in asteroid_tracker.py)
   - asteroid_closest_approach
     - Finds the closest approach out of all of Nasa's NEO data
     - How it works:
@@ -24,3 +24,8 @@
        - Gets every approach from each NEO and sorts by closest approach until there are no more pages left to retrieve. The first N results are returned in json format.
   
 ## Tradeoffs and considerations
+  - Considered creating an asteroid class but I didn't think that efficiency in code would be improved by adding it. I think it would've made logic and data unraveling more approachable but might have taken away from performance.
+  - Capped the nearest misses to 200 pages. While this isn't ideal it helped me write and debug code without having to worry too much about hitting the request limit. This also allowed me to delete and reload cassettes when needed.
+  
+## Future iterations
+  - Would love to implement some sort of caching. This would improve the runtime a lot and make the end user experience better.
